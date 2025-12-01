@@ -613,11 +613,11 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo [LICENSE](./LICENSE) pa
 
 ## 👨‍💻 Autor
 
-**Tu Nombre**
+**atonixdev.com**
 
-- GitHub: [@tu-usuario](https://github.com/tu-usuario)
-- LinkedIn: [Tu Nombre](https://linkedin.com/in/tu-perfil)
-- Email: tu-email@ejemplo.com
+- GitHub: [@Atonix-Dev](https://github.com/Atonix-Dev)
+- Website: [atonixdev.com](https://atonixdev.com)
+- Email: dev@atonixdev.com
 
 ---
 
