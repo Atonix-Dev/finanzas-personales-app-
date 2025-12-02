@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
-import { formatEuro } from '@/lib/utils-es'
 import { Plus, CreditCard, Edit, Trash2, Wallet } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import AccountModal from '@/components/accounts/account-modal'
@@ -18,13 +17,6 @@ interface Account {
   type: 'corriente' | 'credito' | 'efectivo' | 'ahorros'
   balance: number
   created_at: string
-}
-
-const accountTypeLabels = {
-  corriente: 'Cuenta Corriente',
-  credito: 'Tarjeta de Crédito',
-  efectivo: 'Efectivo',
-  ahorros: 'Cuenta de Ahorros'
 }
 
 const accountTypeIcons = {
@@ -44,6 +36,17 @@ export default function AccountsContent() {
   const [accountToDelete, setAccountToDelete] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
+  // Dynamic account type labels based on current language
+  const getAccountTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      corriente: t.accounts.corriente,
+      credito: t.accounts.credito,
+      efectivo: t.accounts.efectivo,
+      ahorros: t.accounts.ahorros
+    }
+    return labels[type] || type
+  }
+
   const fetchAccounts = async () => {
     try {
       setLoading(true)
@@ -58,8 +61,8 @@ export default function AccountsContent() {
     } catch (error) {
       console.error('Error fetching accounts:', error)
       toast({
-        title: 'Error',
-        description: 'No se pudieron cargar las cuentas',
+        title: t.common.error,
+        description: t.accounts.noAccounts,
         variant: 'destructive',
       })
     } finally {
@@ -88,8 +91,8 @@ export default function AccountsContent() {
       }
 
       toast({
-        title: '✅ Cuenta eliminada',
-        description: 'La cuenta se ha eliminado correctamente',
+        title: `✅ ${t.accounts.accountDeleted}`,
+        description: t.accounts.accountDeleted,
         className: 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800',
       })
 
@@ -101,8 +104,8 @@ export default function AccountsContent() {
       fetchAccounts()
     } catch (error: any) {
       toast({
-        title: '❌ Error',
-        description: error.message || 'No se pudo eliminar la cuenta',
+        title: `❌ ${t.common.error}`,
+        description: error.message || t.common.error,
         variant: 'destructive',
       })
     } finally {
@@ -169,16 +172,16 @@ export default function AccountsContent() {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Cuentas
+            {t.accounts.title}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Gestiona todas tus cuentas bancarias y de efectivo
+            {t.accounts.subtitle}
           </p>
         </div>
         
         <Button onClick={() => setIsModalOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
-          Nueva Cuenta
+          {t.accounts.new}
         </Button>
       </div>
 
@@ -189,12 +192,12 @@ export default function AccountsContent() {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-blue-600 flex items-center">
                 <Wallet className="h-4 w-4 mr-2" />
-                Balance Total
+                {t.accounts.totalBalance}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className={`text-2xl font-bold ${totalBalance >= 0 ? 'text-green-700' : 'text-red-700'}`}>
-                {formatEuro(totalBalance)}
+                {formatCurrency(totalBalance)}
               </div>
             </CardContent>
           </Card>
@@ -202,12 +205,12 @@ export default function AccountsContent() {
           <Card className="border-l-4 border-l-green-500">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-green-600">
-                Activos
+                {t.accounts.title === 'Accounts' ? 'Assets' : 'Activos'}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-700">
-                {formatEuro(positiveBalance)}
+                {formatCurrency(positiveBalance)}
               </div>
             </CardContent>
           </Card>
@@ -215,12 +218,12 @@ export default function AccountsContent() {
           <Card className="border-l-4 border-l-red-500">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-red-600">
-                Pasivos
+                {t.accounts.title === 'Accounts' ? 'Liabilities' : 'Pasivos'}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-red-700">
-                {formatEuro(negativeBalance)}
+                {formatCurrency(negativeBalance)}
               </div>
             </CardContent>
           </Card>
@@ -232,15 +235,15 @@ export default function AccountsContent() {
         <Card className="text-center py-12">
           <CardHeader>
             <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <CardTitle>No tienes cuentas registradas</CardTitle>
+            <CardTitle>{t.accounts.noAccounts}</CardTitle>
             <CardDescription>
-              Crea tu primera cuenta para comenzar a gestionar tus finanzas
+              {t.accounts.createFirst}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button onClick={() => setIsModalOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
-              Crear Primera Cuenta
+              {t.accounts.createAccount}
             </Button>
           </CardContent>
         </Card>
@@ -257,7 +260,7 @@ export default function AccountsContent() {
                     <div>
                       <CardTitle className="text-lg">{account.name}</CardTitle>
                       <Badge variant="outline" className="mt-1">
-                        {accountTypeLabels[account.type]}
+                        {getAccountTypeLabel(account.type)}
                       </Badge>
                     </div>
                   </div>
@@ -284,22 +287,22 @@ export default function AccountsContent() {
                 <div className="space-y-3">
                   <div>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                      Balance Actual
+                      {t.accounts.balance}
                     </p>
                     <p className={`text-2xl font-bold ${
                       account.balance >= 0 ? 'text-green-600' : 'text-red-600'
                     }`}>
-                      {formatEuro(account.balance)}
+                      {formatCurrency(account.balance)}
                     </p>
                   </div>
                   
                   <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">
-                        Tipo de cuenta
+                        {t.accounts.type}
                       </span>
                       <span className="font-medium">
-                        {accountTypeLabels[account.type]}
+                        {getAccountTypeLabel(account.type)}
                       </span>
                     </div>
                   </div>
@@ -322,14 +325,14 @@ export default function AccountsContent() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogTitle>{t.accounts.confirmDelete.split('?')[0]}?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. La cuenta será eliminada permanentemente junto con todas sus transacciones asociadas.
+              {t.accounts.confirmDelete}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={cancelDeleteAccount} disabled={isDeleting}>
-              Cancelar
+              {t.common.cancel}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteAccount}
@@ -339,10 +342,10 @@ export default function AccountsContent() {
               {isDeleting ? (
                 <>
                   <span className="animate-spin mr-2">⏳</span>
-                  Eliminando...
+                  {t.common.loading}
                 </>
               ) : (
-                'Sí, eliminar'
+                t.common.yes + ', ' + t.common.delete.toLowerCase()
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
