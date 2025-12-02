@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Progress } from '@/components/ui/progress'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
-import { formatEuro, formatMonthYear, getCurrentMonth, getLastNMonths, formatDate } from '@/lib/utils-es'
+import { formatMonthYear, getCurrentMonth, getLastNMonths, formatDate } from '@/lib/utils-es'
 import { Plus, Target, Edit, Trash2, AlertTriangle, CheckCircle, XCircle, Receipt } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import BudgetModal from '@/components/budgets/budget-modal'
@@ -83,8 +83,8 @@ export default function BudgetsContent() {
     } catch (error) {
       console.error('Error fetching budgets:', error)
       toast({
-        title: 'Error',
-        description: 'No se pudieron cargar los presupuestos',
+        title: t.common.error,
+        description: t.budgets.noBudgets,
         variant: 'destructive',
       })
     } finally {
@@ -111,8 +111,8 @@ export default function BudgetsContent() {
       }
 
       toast({
-        title: '✅ Presupuesto eliminado',
-        description: 'El presupuesto se ha eliminado correctamente',
+        title: `✅ ${t.budgets.budgetDeleted}`,
+        description: t.budgets.budgetDeleted,
         className: 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800',
       })
 
@@ -124,8 +124,8 @@ export default function BudgetsContent() {
       fetchBudgets()
     } catch (error) {
       toast({
-        title: '❌ Error',
-        description: 'No se pudo eliminar el presupuesto',
+        title: `❌ ${t.common.error}`,
+        description: t.common.error,
         variant: 'destructive',
       })
     } finally {
@@ -178,8 +178,8 @@ export default function BudgetsContent() {
     } catch (error) {
       console.error('Error fetching budget transactions:', error)
       toast({
-        title: 'Error',
-        description: 'No se pudieron cargar las transacciones',
+        title: t.common.error,
+        description: t.transactions.loadError,
         variant: 'destructive',
       })
     } finally {
@@ -226,6 +226,9 @@ export default function BudgetsContent() {
   const budgetsExceeded = budgets.filter(b => b.status === 'exceeded').length
   const budgetsWarning = budgets.filter(b => b.status === 'warning').length
 
+  // Translation helper
+  const isEnglish = t.budgets.title === 'Budgets'
+
   if (loading) {
     return (
       <div className="p-6">
@@ -253,10 +256,10 @@ export default function BudgetsContent() {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Presupuestos
+            {t.budgets.title}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Controla tus gastos con presupuestos mensuales
+            {t.budgets.subtitle}
           </p>
         </div>
         
@@ -276,7 +279,7 @@ export default function BudgetsContent() {
           
           <Button onClick={() => setIsModalOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
-            Nuevo Presupuesto
+            {t.budgets.new}
           </Button>
         </div>
       </div>
@@ -287,12 +290,12 @@ export default function BudgetsContent() {
           <Card className="border-l-4 border-l-blue-500">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-blue-600">
-                Presupuesto Total
+                {isEnglish ? 'Total Budget' : 'Presupuesto Total'}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-blue-700">
-                {formatEuro(totalBudget)}
+                {formatCurrency(totalBudget)}
               </div>
             </CardContent>
           </Card>
@@ -300,12 +303,12 @@ export default function BudgetsContent() {
           <Card className="border-l-4 border-l-red-500">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-red-600">
-                Total Gastado
+                {isEnglish ? 'Total Spent' : 'Total Gastado'}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-red-700">
-                {formatEuro(totalSpent)}
+                {formatCurrency(totalSpent)}
               </div>
             </CardContent>
           </Card>
@@ -313,12 +316,12 @@ export default function BudgetsContent() {
           <Card className="border-l-4 border-l-green-500">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-green-600">
-                Disponible
+                {isEnglish ? 'Available' : 'Disponible'}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-700">
-                {formatEuro(totalRemaining)}
+                {formatCurrency(totalRemaining)}
               </div>
             </CardContent>
           </Card>
@@ -326,24 +329,24 @@ export default function BudgetsContent() {
           <Card className="border-l-4 border-l-purple-500">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-purple-600">
-                Estado
+                {isEnglish ? 'Status' : 'Estado'}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-1">
                 {budgetsExceeded > 0 && (
                   <div className="text-sm text-red-600">
-                    {budgetsExceeded} excedido{budgetsExceeded !== 1 ? 's' : ''}
+                    {budgetsExceeded} {isEnglish ? 'exceeded' : 'excedido' + (budgetsExceeded !== 1 ? 's' : '')}
                   </div>
                 )}
                 {budgetsWarning > 0 && (
                   <div className="text-sm text-yellow-600">
-                    {budgetsWarning} en alerta
+                    {budgetsWarning} {isEnglish ? 'in alert' : 'en alerta'}
                   </div>
                 )}
                 {budgetsExceeded === 0 && budgetsWarning === 0 && (
                   <div className="text-sm text-green-600">
-                    Todo bajo control
+                    {isEnglish ? 'All under control' : 'Todo bajo control'}
                   </div>
                 )}
               </div>
@@ -357,15 +360,15 @@ export default function BudgetsContent() {
         <Card className="text-center py-12">
           <CardHeader>
             <Target className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <CardTitle>No hay presupuestos para {formatMonthYear(selectedMonth)}</CardTitle>
+            <CardTitle>{t.budgets.noBudgets} {formatMonthYear(selectedMonth)}</CardTitle>
             <CardDescription>
-              Crea tu primer presupuesto para comenzar a controlar tus gastos
+              {t.budgets.createFirst}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button onClick={() => setIsModalOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
-              Crear Primer Presupuesto
+              {t.budgets.createBudget}
             </Button>
           </CardContent>
         </Card>
@@ -408,7 +411,7 @@ export default function BudgetsContent() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600 dark:text-gray-400">
-                      Progreso
+                      {isEnglish ? 'Progress' : 'Progreso'}
                     </span>
                     <span className={`font-medium ${getStatusColor(budget.status)}`}>
                       {budget.percentage}%
@@ -424,26 +427,26 @@ export default function BudgetsContent() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                      Presupuesto:
+                      {t.budgets.amount}:
                     </span>
                     <span className="font-medium">
-                      {formatEuro(budget.amount)}
+                      {formatCurrency(budget.amount)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                      Gastado:
+                      {t.budgets.spent}:
                     </span>
                     <span className="font-medium text-red-600">
-                      {formatEuro(budget.spent)}
+                      {formatCurrency(budget.spent)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                      Restante:
+                      {t.budgets.remaining}:
                     </span>
                     <span className={`font-medium ${budget.remaining > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {formatEuro(budget.remaining)}
+                      {formatCurrency(budget.remaining)}
                     </span>
                   </div>
                 </div>
@@ -455,9 +458,11 @@ export default function BudgetsContent() {
                   onClick={() => handleViewBudgetDetails(budget)}
                 >
                   <Receipt className="h-4 w-4 mr-2" />
-                  {budget.status === 'exceeded' ? 'Ver Gastos Excedidos' :
-                   budget.status === 'warning' ? 'Ver Gastos' :
-                   'Dentro del Presupuesto'}
+                  {budget.status === 'exceeded' 
+                    ? (isEnglish ? 'View Exceeded Expenses' : 'Ver Gastos Excedidos')
+                    : budget.status === 'warning' 
+                    ? (isEnglish ? 'View Expenses' : 'Ver Gastos')
+                    : (isEnglish ? 'Within Budget' : 'Dentro del Presupuesto')}
                 </Button>
               </CardContent>
             </Card>
@@ -482,7 +487,9 @@ export default function BudgetsContent() {
               {selectedBudget?.category.name} - {selectedBudget && formatMonthYear(selectedBudget.month)}
             </DialogTitle>
             <DialogDescription>
-              Transacciones de esta categoría en el período seleccionado
+              {isEnglish 
+                ? 'Transactions for this category in the selected period'
+                : 'Transacciones de esta categoría en el período seleccionado'}
             </DialogDescription>
           </DialogHeader>
           
@@ -496,23 +503,27 @@ export default function BudgetsContent() {
             <div className="text-center py-8">
               <Receipt className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600 dark:text-gray-400">
-                No hay transacciones registradas para esta categoría en este mes
+                {isEnglish
+                  ? 'No transactions recorded for this category this month'
+                  : 'No hay transacciones registradas para esta categoría en este mes'}
               </p>
             </div>
           ) : (
             <div className="space-y-3">
               <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Total gastado</p>
-                  <p className="text-2xl font-bold text-red-600">{formatEuro(selectedBudget?.spent || 0)}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{t.budgets.spent}</p>
+                  <p className="text-2xl font-bold text-red-600">{formatCurrency(selectedBudget?.spent || 0)}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">De {formatEuro(selectedBudget?.amount || 0)}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{isEnglish ? 'Of' : 'De'} {formatCurrency(selectedBudget?.amount || 0)}</p>
                   <p className={`text-lg font-semibold ${
                     (selectedBudget?.remaining || 0) > 0 ? 'text-green-600' : 'text-red-600'
                   }`}>
-                    {(selectedBudget?.remaining || 0) > 0 ? 'Quedan ' : 'Excedido '}
-                    {formatEuro(Math.abs(selectedBudget?.remaining || 0))}
+                    {(selectedBudget?.remaining || 0) > 0 
+                      ? (isEnglish ? 'Left ' : 'Quedan ')
+                      : (isEnglish ? 'Exceeded ' : 'Excedido ')}
+                    {formatCurrency(Math.abs(selectedBudget?.remaining || 0))}
                   </p>
                 </div>
               </div>
@@ -539,7 +550,7 @@ export default function BudgetsContent() {
                     </div>
                     <div className="text-right">
                       <p className="font-semibold text-red-600">
-                        -{formatEuro(transaction.amount)}
+                        -{formatCurrency(transaction.amount)}
                       </p>
                     </div>
                   </div>
@@ -554,14 +565,14 @@ export default function BudgetsContent() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogTitle>{t.budgets.confirmDelete.split('?')[0]}?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. El presupuesto será eliminado permanentemente.
+              {t.budgets.confirmDelete}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={cancelDeleteBudget} disabled={isDeleting}>
-              Cancelar
+              {t.common.cancel}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteBudget}
@@ -571,10 +582,10 @@ export default function BudgetsContent() {
               {isDeleting ? (
                 <>
                   <span className="animate-spin mr-2">⏳</span>
-                  Eliminando...
+                  {t.common.loading}
                 </>
               ) : (
-                'Sí, eliminar'
+                t.common.yes + ', ' + t.common.delete.toLowerCase()
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
