@@ -8,8 +8,8 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
-import { formatEuro, formatDate, getTransactionColor } from '@/lib/utils-es'
-import { Plus, Search, Filter, Edit, Trash2, Receipt, ArrowUpDown } from 'lucide-react'
+import { formatDate, getTransactionColor } from '@/lib/utils-es'
+import { Plus, Search, Edit, Trash2, Receipt, ArrowUpDown } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import TransactionModal from '@/components/transactions/transaction-modal'
 import { useI18n } from '@/lib/i18n/context'
@@ -125,7 +125,7 @@ export default function TransactionsContent() {
 
       toast({
         title: `✅ ${t.transactions.transactionDeleted}`,
-        description: t.transactions.transactionDeleted,
+        description: t.transactions.deleteSuccess,
         className: 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800',
       })
 
@@ -138,7 +138,7 @@ export default function TransactionsContent() {
     } catch (error) {
       toast({
         title: `❌ ${t.common.error}`,
-        description: t.common.error,
+        description: t.transactions.deleteError,
         variant: 'destructive',
       })
     } finally {
@@ -207,16 +207,16 @@ export default function TransactionsContent() {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Transacciones
+            {t.transactions.title}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Gestiona todos tus ingresos y gastos
+            {t.transactions.subtitle}
           </p>
         </div>
         
         <Button onClick={() => setIsModalOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
-          Nueva Transacción
+          {t.transactions.new}
         </Button>
       </div>
 
@@ -227,7 +227,7 @@ export default function TransactionsContent() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Buscar transacciones..."
+                placeholder={t.transactions.search}
                 className="pl-10"
                 value={filters.search}
                 onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
@@ -242,9 +242,9 @@ export default function TransactionsContent() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos los tipos</SelectItem>
-                <SelectItem value="ingreso">Ingresos</SelectItem>
-                <SelectItem value="gasto">Gastos</SelectItem>
+                <SelectItem value="all">{t.transactions.allTypes}</SelectItem>
+                <SelectItem value="ingreso">{t.transactions.income}</SelectItem>
+                <SelectItem value="gasto">{t.transactions.expense}</SelectItem>
               </SelectContent>
             </Select>
 
@@ -257,14 +257,14 @@ export default function TransactionsContent() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="desc">Más recientes primero</SelectItem>
-                <SelectItem value="asc">Más antiguos primero</SelectItem>
+                <SelectItem value="desc">{t.transactions.allTypes === 'All types' ? 'Most recent first' : 'Más recientes primero'}</SelectItem>
+                <SelectItem value="asc">{t.transactions.allTypes === 'All types' ? 'Oldest first' : 'Más antiguos primero'}</SelectItem>
               </SelectContent>
             </Select>
 
             <div className="flex items-center space-x-2">
               <Badge variant="outline">
-                {filteredTransactions.length} resultado{filteredTransactions.length !== 1 ? 's' : ''}
+                {filteredTransactions.length} {filteredTransactions.length !== 1 ? t.dashboard.transactions : t.dashboard.transaction}
               </Badge>
             </div>
           </div>
@@ -276,11 +276,11 @@ export default function TransactionsContent() {
         <Card className="text-center py-12">
           <CardHeader>
             <Receipt className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <CardTitle>No hay transacciones</CardTitle>
+            <CardTitle>{t.transactions.noTransactions}</CardTitle>
             <CardDescription>
               {transactions.length === 0 
-                ? 'Aún no has registrado ninguna transacción. ¡Crea tu primera transacción!'
-                : 'No se encontraron transacciones que coincidan con los filtros aplicados.'
+                ? t.transactions.noTransactionsYet + ' ' + t.transactions.createFirstMessage
+                : t.transactions.noResultsMessage
               }
             </CardDescription>
           </CardHeader>
@@ -288,7 +288,7 @@ export default function TransactionsContent() {
             {transactions.length === 0 && (
               <Button onClick={() => setIsModalOpen(true)}>
                 <Plus className="h-4 w-4 mr-2" />
-                Crear Primera Transacción
+                {t.transactions.createTransaction}
               </Button>
             )}
           </CardContent>
@@ -306,14 +306,14 @@ export default function TransactionsContent() {
                           variant={transaction.type === 'ingreso' ? 'default' : 'destructive'}
                           className="capitalize"
                         >
-                          {transaction.type}
+                          {transaction.type === 'ingreso' ? t.transactions.income : t.transactions.expense}
                         </Badge>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           {formatDate(transaction.date)}
                         </p>
                       </div>
                       <p className={`text-xl font-bold ${getTransactionColor(transaction.type)}`}>
-                        {transaction.type === 'ingreso' ? '+' : '-'}{formatEuro(Math.abs(transaction.amount))}
+                        {transaction.type === 'ingreso' ? '+' : '-'}{formatCurrency(Math.abs(transaction.amount))}
                       </p>
                     </div>
                     
@@ -372,10 +372,10 @@ export default function TransactionsContent() {
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
           >
-            Anterior
+            {t.transactions.allTypes === 'All types' ? 'Previous' : 'Anterior'}
           </Button>
           <span className="text-sm text-gray-600 dark:text-gray-400">
-            Página {currentPage} de {totalPages}
+            {t.transactions.allTypes === 'All types' ? 'Page' : 'Página'} {currentPage} {t.transactions.of} {totalPages}
           </span>
           <Button
             variant="outline"
@@ -383,7 +383,7 @@ export default function TransactionsContent() {
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
           >
-            Siguiente
+            {t.transactions.allTypes === 'All types' ? 'Next' : 'Siguiente'}
           </Button>
         </div>
       )}
@@ -400,14 +400,14 @@ export default function TransactionsContent() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogTitle>{t.transactions.confirmDelete.split('?')[0]}?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. La transacción será eliminada permanentemente de tu cuenta.
+              {t.transactions.confirmDelete}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={cancelDeleteTransaction} disabled={isDeleting}>
-              Cancelar
+              {t.common.cancel}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteTransaction}
@@ -417,10 +417,10 @@ export default function TransactionsContent() {
               {isDeleting ? (
                 <>
                   <span className="animate-spin mr-2">⏳</span>
-                  Eliminando...
+                  {t.common.loading}
                 </>
               ) : (
-                'Sí, eliminar'
+                t.common.yes + ', ' + t.common.delete.toLowerCase()
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
