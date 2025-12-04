@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { formatEuro, formatMonthYear, getCurrentMonth } from '@/lib/utils-es'
+import { formatMonthYear } from '@/lib/utils-es'
 import { toast } from '@/hooks/use-toast'
 import { useConfetti } from '@/hooks/use-confetti'
+import { useI18n } from '@/lib/i18n/context'
 
 interface Category {
   id: string
@@ -35,6 +36,7 @@ interface BudgetModalProps {
 }
 
 export default function BudgetModal({ isOpen, onClose, onSave, budget, defaultMonth }: BudgetModalProps) {
+  const { t, formatCurrency } = useI18n()
   const { simpleConfetti } = useConfetti()
   const [loading, setLoading] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
@@ -44,6 +46,9 @@ export default function BudgetModal({ isOpen, onClose, onSave, budget, defaultMo
     amount: ''
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  // Translation helper
+  const isEnglish = t.budgets.title === 'Budgets'
 
   const fetchCategories = async () => {
     try {
@@ -71,15 +76,15 @@ export default function BudgetModal({ isOpen, onClose, onSave, budget, defaultMo
     const newErrors: Record<string, string> = {}
 
     if (!formData.category_id) {
-      newErrors.category_id = 'La categoría es requerida'
+      newErrors.category_id = isEnglish ? 'Category is required' : 'La categoría es requerida'
     }
 
     if (!formData.month) {
-      newErrors.month = 'El mes es requerido'
+      newErrors.month = isEnglish ? 'Month is required' : 'El mes es requerido'
     }
 
     if (!formData.amount || parseFloat(formData.amount) <= 0) {
-      newErrors.amount = 'El monto debe ser mayor a 0'
+      newErrors.amount = isEnglish ? 'Amount must be greater than 0' : 'El monto debe ser mayor a 0'
     }
 
     setErrors(newErrors)
@@ -109,7 +114,7 @@ export default function BudgetModal({ isOpen, onClose, onSave, budget, defaultMo
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Error al guardar el presupuesto')
+        throw new Error(data.error || (isEnglish ? 'Error saving budget' : 'Error al guardar el presupuesto'))
       }
 
       // ¡Lanzar confeti para nuevo presupuesto! 🎉
@@ -118,18 +123,20 @@ export default function BudgetModal({ isOpen, onClose, onSave, budget, defaultMo
       }
 
       toast({
-        title: budget ? '✅ Presupuesto actualizado' : '🎉 ¡Presupuesto creado!',
+        title: budget 
+          ? `✅ ${isEnglish ? 'Budget updated' : 'Presupuesto actualizado'}`
+          : `🎉 ${isEnglish ? 'Budget created!' : '¡Presupuesto creado!'}`,
         description: budget 
-          ? 'El presupuesto se ha actualizado correctamente'
-          : 'El presupuesto se ha creado correctamente',
+          ? (isEnglish ? 'Budget has been updated successfully' : 'El presupuesto se ha actualizado correctamente')
+          : (isEnglish ? 'Budget has been created successfully' : 'El presupuesto se ha creado correctamente'),
         className: !budget ? 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800' : '',
       })
 
       onSave()
     } catch (error: any) {
       toast({
-        title: '❌ Error',
-        description: error.message || 'No se pudo guardar el presupuesto',
+        title: `❌ ${t.common.error}`,
+        description: error.message || (isEnglish ? 'Could not save budget' : 'No se pudo guardar el presupuesto'),
         variant: 'destructive',
       })
     } finally {
@@ -182,12 +189,14 @@ export default function BudgetModal({ isOpen, onClose, onSave, budget, defaultMo
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {budget ? 'Editar Presupuesto' : 'Nuevo Presupuesto'}
+            {budget 
+              ? (isEnglish ? 'Edit Budget' : 'Editar Presupuesto')
+              : (isEnglish ? 'New Budget' : 'Nuevo Presupuesto')}
           </DialogTitle>
           <DialogDescription>
             {budget 
-              ? 'Modifica los datos del presupuesto'
-              : 'Crea un nuevo presupuesto para controlar tus gastos'
+              ? (isEnglish ? 'Modify the budget data' : 'Modifica los datos del presupuesto')
+              : (isEnglish ? 'Create a new budget to control your expenses' : 'Crea un nuevo presupuesto para controlar tus gastos')
             }
           </DialogDescription>
         </DialogHeader>
@@ -195,13 +204,13 @@ export default function BudgetModal({ isOpen, onClose, onSave, budget, defaultMo
         <div className="space-y-4">
           {/* Categoría */}
           <div className="space-y-2">
-            <Label>Categoría *</Label>
+            <Label>{isEnglish ? 'Category' : 'Categoría'} *</Label>
             <Select 
               value={formData.category_id} 
               onValueChange={(value) => setFormData(prev => ({ ...prev, category_id: value }))}
             >
               <SelectTrigger className={errors.category_id ? 'border-red-500' : ''}>
-                <SelectValue placeholder="Seleccionar categoría" />
+                <SelectValue placeholder={isEnglish ? 'Select category' : 'Seleccionar categoría'} />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((category) => (
@@ -216,13 +225,13 @@ export default function BudgetModal({ isOpen, onClose, onSave, budget, defaultMo
 
           {/* Mes */}
           <div className="space-y-2">
-            <Label>Mes *</Label>
+            <Label>{isEnglish ? 'Month' : 'Mes'} *</Label>
             <Select 
               value={formData.month} 
               onValueChange={(value) => setFormData(prev => ({ ...prev, month: value }))}
             >
               <SelectTrigger className={errors.month ? 'border-red-500' : ''}>
-                <SelectValue placeholder="Seleccionar mes" />
+                <SelectValue placeholder={isEnglish ? 'Select month' : 'Seleccionar mes'} />
               </SelectTrigger>
               <SelectContent>
                 {monthOptions.map((option) => (
@@ -237,12 +246,12 @@ export default function BudgetModal({ isOpen, onClose, onSave, budget, defaultMo
 
           {/* Monto */}
           <div className="space-y-2">
-            <Label>Monto del Presupuesto (€) *</Label>
+            <Label>{t.budgets.amount} *</Label>
             <Input
               type="number"
               step="0.01"
               min="0"
-              placeholder="0,00"
+              placeholder="0.00"
               value={formData.amount}
               onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
               className={errors.amount ? 'border-red-500' : ''}
@@ -250,21 +259,27 @@ export default function BudgetModal({ isOpen, onClose, onSave, budget, defaultMo
             {errors.amount && <p className="text-sm text-red-600">{errors.amount}</p>}
             {formData.amount && !isNaN(parseFloat(formData.amount)) && (
               <p className="text-sm text-gray-600">
-                {formatEuro(parseFloat(formData.amount))}
+                {formatCurrency(parseFloat(formData.amount))}
               </p>
             )}
             <p className="text-xs text-gray-500">
-              Este será el límite máximo que planeas gastar en esta categoría durante el mes seleccionado
+              {isEnglish 
+                ? 'This will be the maximum limit you plan to spend in this category during the selected month'
+                : 'Este será el límite máximo que planeas gastar en esta categoría durante el mes seleccionado'}
             </p>
           </div>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose}>
-            Cancelar
+            {t.common.cancel}
           </Button>
           <Button onClick={handleSave} disabled={loading}>
-            {loading ? 'Guardando...' : (budget ? 'Actualizar' : 'Crear')}
+            {loading 
+              ? (isEnglish ? 'Saving...' : 'Guardando...') 
+              : (budget 
+                  ? (isEnglish ? 'Update' : 'Actualizar') 
+                  : (isEnglish ? 'Create' : 'Crear'))}
           </Button>
         </DialogFooter>
       </DialogContent>
