@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { formatEuro } from '@/lib/utils-es'
 import { useI18n } from '@/lib/i18n/context'
 import { 
   Brain, 
@@ -49,10 +48,13 @@ interface AnalysisResult {
 }
 
 export default function AnalysisContent() {
-  const { t } = useI18n()
+  const { t, formatCurrency } = useI18n()
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [progress, setProgress] = useState(0)
+
+  // Translation helper
+  const isEnglish = t.analysis.title === 'AI Analysis'
 
   const runAnalysis = async () => {
     setIsAnalyzing(true)
@@ -193,6 +195,13 @@ export default function AnalysisContent() {
     }
   }
 
+  const getImpactLabel = (impact: string) => {
+    if (isEnglish) {
+      return impact === 'high' ? 'High impact' : impact === 'medium' ? 'Medium impact' : 'Low impact'
+    }
+    return impact === 'high' ? 'Alto impacto' : impact === 'medium' ? 'Impacto medio' : 'Bajo impacto'
+  }
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -304,7 +313,7 @@ export default function AnalysisContent() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-blue-700">
-                  {formatEuro(analysisResult.total_monthly_potential)}
+                  {formatCurrency(analysisResult.total_monthly_potential)}
                 </div>
                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                   {t.analysis.estimatedPotential}
@@ -321,7 +330,7 @@ export default function AnalysisContent() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-indigo-700">
-                  {formatEuro(analysisResult.total_annual_potential)}
+                  {formatCurrency(analysisResult.total_annual_potential)}
                 </div>
                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                   {t.analysis.yearProjection}
@@ -360,13 +369,11 @@ export default function AnalysisContent() {
                           </p>
                           <div className="flex items-center space-x-2">
                             <Badge variant="outline" className="capitalize">
-                              {insight.impact === 'high' ? 'Alto impacto' :
-                               insight.impact === 'medium' ? 'Impacto medio' :
-                               'Bajo impacto'}
+                              {getImpactLabel(insight.impact)}
                             </Badge>
                             {insight.amount && (
                               <Badge variant="secondary">
-                                {formatEuro(insight.amount)}
+                                {formatCurrency(insight.amount)}
                               </Badge>
                             )}
                           </div>
@@ -422,7 +429,7 @@ export default function AnalysisContent() {
                             {t.analysis.estimatedMonthlySavings}
                           </p>
                           <p className="font-bold text-green-600">
-                            {formatEuro(recommendation.potential_monthly_savings)}
+                            {formatCurrency(recommendation.potential_monthly_savings)}
                           </p>
                         </div>
                         
@@ -431,7 +438,7 @@ export default function AnalysisContent() {
                             {t.analysis.estimatedAnnualSavings}
                           </p>
                           <p className="font-bold text-blue-600">
-                            {formatEuro(recommendation.potential_annual_savings)}
+                            {formatCurrency(recommendation.potential_annual_savings)}
                           </p>
                         </div>
                       </div>
@@ -444,7 +451,9 @@ export default function AnalysisContent() {
 
           {/* Analysis Date */}
           <div className="text-center text-sm text-gray-500 dark:text-gray-400">
-            Análisis realizado el {new Date(analysisResult.analysis_date).toLocaleString('es-ES')}
+            {isEnglish 
+              ? `Analysis performed on ${new Date(analysisResult.analysis_date).toLocaleString('en-US')}`
+              : `Análisis realizado el ${new Date(analysisResult.analysis_date).toLocaleString('es-ES')}`}
           </div>
         </>
       )}
@@ -454,51 +463,67 @@ export default function AnalysisContent() {
         <Card className="text-center py-12">
           <CardHeader>
             <Brain className="h-16 w-16 text-purple-400 mx-auto mb-4" />
-            <CardTitle className="text-xl">Análisis Financiero con IA</CardTitle>
+            <CardTitle className="text-xl">{t.analysis.title}</CardTitle>
             <CardDescription className="max-w-2xl mx-auto">
-              Nuestro asistente de inteligencia artificial analizará tus transacciones y presupuestos 
-              para identificar patrones de gasto, detectar gastos excesivos y generar recomendaciones 
-              personalizadas de ahorro con impacto estimado.
+              {isEnglish 
+                ? 'Our AI assistant will analyze your transactions and budgets to identify spending patterns, detect excessive expenses, and generate personalized savings recommendations with estimated impact.'
+                : 'Nuestro asistente de inteligencia artificial analizará tus transacciones y presupuestos para identificar patrones de gasto, detectar gastos excesivos y generar recomendaciones personalizadas de ahorro con impacto estimado.'}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                 <AlertTriangle className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                <h4 className="font-medium mb-1">Detecta Sobrepresupuestos</h4>
+                <h4 className="font-medium mb-1">
+                  {isEnglish ? 'Detects Over-budgets' : 'Detecta Sobrepresupuestos'}
+                </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Identifica categorías donde excediste tus límites
+                  {isEnglish 
+                    ? 'Identifies categories where you exceeded your limits'
+                    : 'Identifica categorías donde excediste tus límites'}
                 </p>
               </div>
               
               <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                 <Calendar className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                <h4 className="font-medium mb-1">Gastos Hormiga</h4>
+                <h4 className="font-medium mb-1">
+                  {isEnglish ? 'Small Recurring Expenses' : 'Gastos Hormiga'}
+                </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Encuentra pequeños gastos frecuentes que suman mucho
+                  {isEnglish 
+                    ? 'Finds small frequent expenses that add up'
+                    : 'Encuentra pequeños gastos frecuentes que suman mucho'}
                 </p>
               </div>
               
               <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
                 <Target className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                <h4 className="font-medium mb-1">Recomendaciones</h4>
+                <h4 className="font-medium mb-1">
+                  {t.analysis.recommendations}
+                </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Obtén consejos concretos y accionables
+                  {isEnglish 
+                    ? 'Get concrete and actionable advice'
+                    : 'Obtén consejos concretos y accionables'}
                 </p>
               </div>
               
               <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
                 <DollarSign className="h-8 w-8 text-yellow-600 mx-auto mb-2" />
-                <h4 className="font-medium mb-1">Impacto Estimado</h4>
+                <h4 className="font-medium mb-1">
+                  {isEnglish ? 'Estimated Impact' : 'Impacto Estimado'}
+                </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Ve cuánto podrías ahorrar mensual y anualmente
+                  {isEnglish 
+                    ? 'See how much you could save monthly and annually'
+                    : 'Ve cuánto podrías ahorrar mensual y anualmente'}
                 </p>
               </div>
             </div>
             
             <Button onClick={runAnalysis} size="lg">
               <Brain className="h-5 w-5 mr-2" />
-              Comenzar Análisis
+              {t.analysis.analyzeButton}
             </Button>
           </CardContent>
         </Card>
