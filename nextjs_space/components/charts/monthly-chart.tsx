@@ -1,8 +1,6 @@
-
 'use client'
 
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, Legend } from 'recharts'
-import { formatEuro, formatMonthYear } from '@/lib/utils-es'
 
 interface MonthlyData {
   month: string
@@ -12,31 +10,45 @@ interface MonthlyData {
 
 interface MonthlyChartProps {
   data: MonthlyData[]
+  formatCurrency: (amount: number) => string
+  language: 'es' | 'en'
 }
 
-export default function MonthlyChart({ data }: MonthlyChartProps) {
+export default function MonthlyChart({ data, formatCurrency, language }: MonthlyChartProps) {
+  const isEnglish = language === 'en'
+  
   if (!data || data.length === 0) {
     return (
       <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
-        <p>No hay datos para mostrar</p>
+        <p>{isEnglish ? 'No data to display' : 'No hay datos para mostrar'}</p>
       </div>
     )
   }
 
+  // Formatear mes según idioma
+  const formatMonth = (monthString: string) => {
+    const [year, month] = monthString.split('-')
+    const date = new Date(parseInt(year), parseInt(month) - 1)
+    return date.toLocaleDateString(isEnglish ? 'en-US' : 'es-ES', { month: 'short' })
+  }
+
+  const incomeLabel = isEnglish ? 'income' : 'ingresos'
+  const expensesLabel = isEnglish ? 'expenses' : 'gastos'
+
   const chartData = data.map(item => ({
-    month: formatMonthYear(item.month).split(' ')[0], // Solo el nombre del mes
-    ingresos: item.income,
-    gastos: Math.abs(item.expenses)
+    month: formatMonth(item.month),
+    [incomeLabel]: item.income,
+    [expensesLabel]: Math.abs(item.expenses)
   }))
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
-          <p className="font-medium text-gray-900 dark:text-white">{`${label}`}</p>
+          <p className="font-medium text-gray-900 dark:text-white">{label}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} style={{ color: entry.color }} className="text-sm">
-              {`${entry.dataKey === 'ingresos' ? 'Ingresos' : 'Gastos'}: ${formatEuro(entry.value)}`}
+              {entry.dataKey === incomeLabel ? (isEnglish ? 'Income' : 'Ingresos') : (isEnglish ? 'Expenses' : 'Gastos')}: {formatCurrency(entry.value)}
             </p>
           ))}
         </div>
@@ -57,20 +69,22 @@ export default function MonthlyChart({ data }: MonthlyChartProps) {
           <YAxis 
             tickLine={false}
             tick={{ fontSize: 10 }}
-            tickFormatter={(value) => formatEuro(value)}
+            tickFormatter={(value) => formatCurrency(value)}
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend wrapperStyle={{ fontSize: 11 }} />
           <Line 
             type="monotone" 
-            dataKey="ingresos" 
+            dataKey={incomeLabel}
+            name={isEnglish ? 'Income' : 'Ingresos'}
             stroke="#10b981" 
             strokeWidth={2}
             dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
           />
           <Line 
             type="monotone" 
-            dataKey="gastos" 
+            dataKey={expensesLabel}
+            name={isEnglish ? 'Expenses' : 'Gastos'}
             stroke="#ef4444" 
             strokeWidth={2}
             dot={{ fill: '#ef4444', strokeWidth: 2, r: 4 }}

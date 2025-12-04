@@ -1,21 +1,16 @@
-
 'use client'
 
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { formatEuro, formatDate, getCurrentMonth, getLastNMonths, formatMonthYear } from '@/lib/utils-es'
+import { formatDate, getCurrentMonth } from '@/lib/utils-es'
 import { 
   TrendingUp, 
   TrendingDown, 
   CreditCard, 
   Target,
-  ArrowUpRight,
-  ArrowDownRight,
-  Filter,
   RefreshCw,
   Store
 } from 'lucide-react'
@@ -61,7 +56,7 @@ interface DashboardData {
 }
 
 export default function DashboardContent() {
-  const { t } = useI18n()
+  const { t, formatCurrency, language } = useI18n()
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [filters, setFilters] = useState({
@@ -69,6 +64,12 @@ export default function DashboardContent() {
     accounts: 'all',
     categories: 'all'
   })
+
+  const formatMonthYear = (monthString: string) => {
+    const [year, month] = monthString.split('-')
+    const date = new Date(parseInt(year), parseInt(month) - 1)
+    return date.toLocaleDateString(language === 'en' ? 'en-US' : 'es-ES', { month: 'long', year: 'numeric' })
+  }
 
   const fetchDashboardData = async () => {
     try {
@@ -188,7 +189,7 @@ export default function DashboardContent() {
           </CardHeader>
           <CardContent className="px-4 pb-4">
             <div className="text-xl md:text-2xl font-bold text-green-700">
-              {formatEuro(data.currentMonth.totalIncome)}
+              {formatCurrency(data.currentMonth.totalIncome)}
             </div>
             <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
               {formatMonthYear(getCurrentMonth())}
@@ -205,7 +206,7 @@ export default function DashboardContent() {
           </CardHeader>
           <CardContent className="px-4 pb-4">
             <div className="text-xl md:text-2xl font-bold text-red-700">
-              {formatEuro(data.currentMonth.totalExpenses)}
+              {formatCurrency(data.currentMonth.totalExpenses)}
             </div>
             <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
               {formatMonthYear(getCurrentMonth())}
@@ -224,7 +225,7 @@ export default function DashboardContent() {
             <div className={`text-xl md:text-2xl font-bold ${
               data.currentMonth.balance >= 0 ? 'text-green-700' : 'text-red-700'
             }`}>
-              {formatEuro(data.currentMonth.balance)}
+              {formatCurrency(data.currentMonth.balance)}
             </div>
             <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
               {data.currentMonth.balance >= 0 ? t.dashboard.surplus : t.dashboard.deficit}
@@ -271,7 +272,7 @@ export default function DashboardContent() {
                       {alert.category}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {formatEuro(alert.spent)} de {formatEuro(alert.budget)}
+                      {formatCurrency(alert.spent)} {language === 'en' ? 'of' : 'de'} {formatCurrency(alert.budget)}
                     </p>
                   </div>
                   <Badge variant={alert.percentage >= 100 ? 'destructive' : 'outline'}>
@@ -295,7 +296,7 @@ export default function DashboardContent() {
             </CardDescription>
           </CardHeader>
           <CardContent className="px-4 pb-4 md:px-6 md:pb-6">
-            <MonthlyChart data={data.monthlyData} />
+            <MonthlyChart data={data.monthlyData} formatCurrency={formatCurrency} language={language} />
           </CardContent>
         </Card>
 
@@ -308,7 +309,7 @@ export default function DashboardContent() {
             </CardDescription>
           </CardHeader>
           <CardContent className="px-4 pb-4 md:px-6 md:pb-6">
-            <ExpenseCategoryChart data={data.expensesByCategory} />
+            <ExpenseCategoryChart data={data.expensesByCategory} formatCurrency={formatCurrency} language={language} />
           </CardContent>
         </Card>
       </div>
@@ -327,6 +328,8 @@ export default function DashboardContent() {
             <IncomeExpenseChart 
               income={data.currentMonth.totalIncome}
               expenses={data.currentMonth.totalExpenses}
+              formatCurrency={formatCurrency}
+              language={language}
             />
           </CardContent>
         </Card>
@@ -362,7 +365,7 @@ export default function DashboardContent() {
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p className="font-semibold text-sm md:text-base text-red-600">
-                        {formatEuro(merchant.totalAmount)}
+                        {formatCurrency(merchant.totalAmount)}
                       </p>
                     </div>
                   </div>
@@ -404,7 +407,7 @@ export default function DashboardContent() {
                   <p className={`text-base md:text-lg font-semibold ${
                     account.balance >= 0 ? 'text-green-600' : 'text-red-600'
                   }`}>
-                    {formatEuro(account.balance)}
+                    {formatCurrency(account.balance)}
                   </p>
                 </div>
               ))

@@ -157,6 +157,8 @@ export const translations = {
       confirmDelete: '¿Estás seguro de eliminar esta cuenta?',
       totalBalance: 'Balance Total',
       activeAccounts: 'Cuentas Activas',
+      assets: 'Activos',
+      liabilities: 'Pasivos',
     },
     // Presupuestos
     budgets: {
@@ -268,6 +270,25 @@ export const translations = {
       errorSaving: 'No se pudo guardar la configuración',
       errorDeleting: 'No se pudo eliminar la cuenta. Por favor, intenta de nuevo.',
       yesDelete: 'Sí, eliminar mi cuenta',
+    },
+    // Footer
+    footer: {
+      brand: 'Finanzas Personales',
+      brandDescription: 'Gestiona tus finanzas de manera inteligente con IA',
+      poweredBy: 'Powered by',
+      product: 'Producto',
+      company: 'atonixdev.com',
+      aboutUs: 'Sobre Nosotros',
+      blog: 'Blog',
+      projects: 'Proyectos',
+      contact: 'Contacto',
+      legal: 'Legal',
+      privacy: 'Privacidad',
+      terms: 'Términos de Uso',
+      followUs: 'Síguenos',
+      allRightsReserved: 'Todos los derechos reservados.',
+      madeWith: 'Hecho con',
+      usingAI: 'usando IA y tecnología',
     },
     // Común
     common: {
@@ -469,6 +490,8 @@ export const translations = {
       confirmDelete: 'Are you sure you want to delete this account?',
       totalBalance: 'Total Balance',
       activeAccounts: 'Active Accounts',
+      assets: 'Assets',
+      liabilities: 'Liabilities',
     },
     budgets: {
       title: 'Budgets',
@@ -578,6 +601,25 @@ export const translations = {
       errorDeleting: 'Could not delete account. Please try again.',
       yesDelete: 'Yes, delete my account',
     },
+    // Footer
+    footer: {
+      brand: 'Personal Finance',
+      brandDescription: 'Manage your finances intelligently with AI',
+      poweredBy: 'Powered by',
+      product: 'Product',
+      company: 'atonixdev.com',
+      aboutUs: 'About Us',
+      blog: 'Blog',
+      projects: 'Projects',
+      contact: 'Contact',
+      legal: 'Legal',
+      privacy: 'Privacy',
+      terms: 'Terms of Use',
+      followUs: 'Follow Us',
+      allRightsReserved: 'All rights reserved.',
+      madeWith: 'Made with',
+      usingAI: 'using AI and technology',
+    },
     common: {
       save: 'Save',
       cancel: 'Cancel',
@@ -635,9 +677,6 @@ export const translations = {
 export const currencies = {
   EUR: { symbol: '€', name: 'Euro', position: 'after' },
   USD: { symbol: '$', name: 'US Dollar', position: 'before' },
-  GBP: { symbol: '£', name: 'British Pound', position: 'before' },
-  MXN: { symbol: '$', name: 'Mexican Peso', position: 'before' },
-  ARS: { symbol: '$', name: 'Argentine Peso', position: 'before' },
 };
 
 export const languageNames = {

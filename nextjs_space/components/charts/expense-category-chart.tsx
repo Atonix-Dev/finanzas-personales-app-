@@ -1,8 +1,6 @@
-
 'use client'
 
 import { ResponsiveContainer, PieChart, Pie, Tooltip, Legend, Cell } from 'recharts'
-import { formatEuro } from '@/lib/utils-es'
 
 interface ExpenseCategoryData {
   category: string
@@ -12,15 +10,19 @@ interface ExpenseCategoryData {
 
 interface ExpenseCategoryChartProps {
   data: ExpenseCategoryData[]
+  formatCurrency: (amount: number) => string
+  language: 'es' | 'en'
 }
 
 const COLORS = ['#60B5FF', '#FF9149', '#FF9898', '#FF90BB', '#FF6363', '#80D8C3', '#A19AD3', '#72BF78']
 
-export default function ExpenseCategoryChart({ data }: ExpenseCategoryChartProps) {
+export default function ExpenseCategoryChart({ data, formatCurrency, language }: ExpenseCategoryChartProps) {
+  const isEnglish = language === 'en'
+  
   if (!data || data.length === 0) {
     return (
       <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
-        <p>No hay gastos para mostrar</p>
+        <p>{isEnglish ? 'No expenses to display' : 'No hay gastos para mostrar'}</p>
       </div>
     )
   }
@@ -39,7 +41,7 @@ export default function ExpenseCategoryChart({ data }: ExpenseCategoryChartProps
         <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
           <p className="font-medium text-gray-900 dark:text-white">{data.name}</p>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {formatEuro(data.value)} ({Math.round(data.percentage)}%)
+            {formatCurrency(data.value)} ({Math.round(data.percentage)}%)
           </p>
         </div>
       )
