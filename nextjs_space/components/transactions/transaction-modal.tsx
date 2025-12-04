@@ -6,13 +6,12 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { formatEuro } from '@/lib/utils-es'
 import { X, Plus } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import { useConfetti } from '@/hooks/use-confetti'
+import { useI18n } from '@/lib/i18n/context'
 
 interface Category {
   id: string
@@ -50,11 +49,15 @@ interface TransactionModalProps {
 }
 
 export default function TransactionModal({ isOpen, onClose, onSave, transaction }: TransactionModalProps) {
+  const { t, formatCurrency } = useI18n()
   const { simpleConfetti } = useConfetti()
   const [loading, setLoading] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
   const [accounts, setAccounts] = useState<Account[]>([])
   const [newTag, setNewTag] = useState('')
+
+  // Translation helper
+  const isEnglish = t.transactions.title === 'Transactions'
 
   const [formData, setFormData] = useState({
     date: '',
@@ -110,20 +113,20 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
-    if (!formData.date) newErrors.date = 'La fecha es requerida'
+    if (!formData.date) newErrors.date = isEnglish ? 'Date is required' : 'La fecha es requerida'
     if (!formData.amount || parseFloat(formData.amount) <= 0) {
-      newErrors.amount = 'El importe debe ser mayor a 0'
+      newErrors.amount = isEnglish ? 'Amount must be greater than 0' : 'El importe debe ser mayor a 0'
     }
-    if (!formData.description.trim()) newErrors.description = 'La descripción es requerida'
-    if (!formData.category_id) newErrors.category_id = 'La categoría es requerida'
-    if (!formData.account_id) newErrors.account_id = 'La cuenta es requerida'
+    if (!formData.description.trim()) newErrors.description = isEnglish ? 'Description is required' : 'La descripción es requerida'
+    if (!formData.category_id) newErrors.category_id = isEnglish ? 'Category is required' : 'La categoría es requerida'
+    if (!formData.account_id) newErrors.account_id = isEnglish ? 'Account is required' : 'La cuenta es requerida'
 
     // Validar fecha no futura
     const selectedDate = new Date(formData.date)
     const today = new Date()
     today.setHours(23, 59, 59, 999)
     if (selectedDate > today) {
-      newErrors.date = 'La fecha no puede ser futura'
+      newErrors.date = isEnglish ? 'Date cannot be in the future' : 'La fecha no puede ser futura'
     }
 
     setErrors(newErrors)
@@ -151,7 +154,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction 
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Error al guardar la transacción')
+        throw new Error(errorData.error || (isEnglish ? 'Error saving transaction' : 'Error al guardar la transacción'))
       }
 
       // ¡Lanzar confeti para nueva transacción! 🎉
@@ -160,18 +163,20 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction 
       }
 
       toast({
-        title: transaction ? '✅ Transacción actualizada' : '🎉 ¡Transacción creada!',
+        title: transaction 
+          ? `✅ ${isEnglish ? 'Transaction updated' : 'Transacción actualizada'}`
+          : `🎉 ${isEnglish ? 'Transaction created!' : '¡Transacción creada!'}`,
         description: transaction 
-          ? 'La transacción se ha actualizado correctamente'
-          : 'La transacción se ha creado correctamente',
+          ? (isEnglish ? 'Transaction has been updated successfully' : 'La transacción se ha actualizado correctamente')
+          : (isEnglish ? 'Transaction has been created successfully' : 'La transacción se ha creado correctamente'),
         className: !transaction ? 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800' : '',
       })
 
       onSave()
     } catch (error: any) {
       toast({
-        title: '❌ Error',
-        description: error.message || 'No se pudo guardar la transacción',
+        title: `❌ ${t.common.error}`,
+        description: error.message || (isEnglish ? 'Could not save transaction' : 'No se pudo guardar la transacción'),
         variant: 'destructive',
       })
     } finally {
@@ -228,12 +233,14 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction 
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {transaction ? 'Editar Transacción' : 'Nueva Transacción'}
+            {transaction 
+              ? (isEnglish ? 'Edit Transaction' : 'Editar Transacción')
+              : (isEnglish ? 'New Transaction' : 'Nueva Transacción')}
           </DialogTitle>
           <DialogDescription>
             {transaction 
-              ? 'Modifica los datos de la transacción'
-              : 'Registra una nueva transacción en tu cuenta'
+              ? (isEnglish ? 'Modify the transaction data' : 'Modifica los datos de la transacción')
+              : (isEnglish ? 'Record a new transaction in your account' : 'Registra una nueva transacción en tu cuenta')
             }
           </DialogDescription>
         </DialogHeader>
@@ -241,7 +248,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Tipo */}
           <div className="space-y-2">
-            <Label>Tipo *</Label>
+            <Label>{isEnglish ? 'Type' : 'Tipo'} *</Label>
             <Select 
               value={formData.type} 
               onValueChange={(value: 'ingreso' | 'gasto') => setFormData(prev => ({ ...prev, type: value }))}
@@ -250,15 +257,15 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction 
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ingreso">Ingreso</SelectItem>
-                <SelectItem value="gasto">Gasto</SelectItem>
+                <SelectItem value="ingreso">{t.transactions.income}</SelectItem>
+                <SelectItem value="gasto">{t.transactions.expense}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* Fecha */}
           <div className="space-y-2">
-            <Label>Fecha *</Label>
+            <Label>{isEnglish ? 'Date' : 'Fecha'} *</Label>
             <Input
               type="date"
               value={formData.date}
@@ -270,12 +277,12 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction 
 
           {/* Importe */}
           <div className="space-y-2">
-            <Label>Importe (€) *</Label>
+            <Label>{isEnglish ? 'Amount' : 'Importe'} *</Label>
             <Input
               type="number"
               step="0.01"
               min="0"
-              placeholder="0,00"
+              placeholder="0.00"
               value={formData.amount}
               onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
               className={errors.amount ? 'border-red-500' : ''}
@@ -283,20 +290,20 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction 
             {errors.amount && <p className="text-sm text-red-600">{errors.amount}</p>}
             {formData.amount && (
               <p className="text-sm text-gray-600">
-                {formatEuro(parseFloat(formData.amount) || 0)}
+                {formatCurrency(parseFloat(formData.amount) || 0)}
               </p>
             )}
           </div>
 
           {/* Categoría */}
           <div className="space-y-2">
-            <Label>Categoría *</Label>
+            <Label>{isEnglish ? 'Category' : 'Categoría'} *</Label>
             <Select 
               value={formData.category_id} 
               onValueChange={(value) => setFormData(prev => ({ ...prev, category_id: value }))}
             >
               <SelectTrigger className={errors.category_id ? 'border-red-500' : ''}>
-                <SelectValue placeholder="Seleccionar categoría" />
+                <SelectValue placeholder={isEnglish ? 'Select category' : 'Seleccionar categoría'} />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((category) => (
@@ -311,13 +318,13 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction 
 
           {/* Cuenta */}
           <div className="space-y-2">
-            <Label>Cuenta *</Label>
+            <Label>{isEnglish ? 'Account' : 'Cuenta'} *</Label>
             <Select 
               value={formData.account_id} 
               onValueChange={(value) => setFormData(prev => ({ ...prev, account_id: value }))}
             >
               <SelectTrigger className={errors.account_id ? 'border-red-500' : ''}>
-                <SelectValue placeholder="Seleccionar cuenta" />
+                <SelectValue placeholder={isEnglish ? 'Select account' : 'Seleccionar cuenta'} />
               </SelectTrigger>
               <SelectContent>
                 {accounts.map((account) => (
@@ -332,7 +339,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction 
 
           {/* Método de pago */}
           <div className="space-y-2">
-            <Label>Método de Pago</Label>
+            <Label>{isEnglish ? 'Payment Method' : 'Método de Pago'}</Label>
             <Select 
               value={formData.payment_method} 
               onValueChange={(value) => setFormData(prev => ({ ...prev, payment_method: value }))}
@@ -341,10 +348,10 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction 
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="efectivo">Efectivo</SelectItem>
-                <SelectItem value="tarjeta_debito">Tarjeta de Débito</SelectItem>
-                <SelectItem value="tarjeta_credito">Tarjeta de Crédito</SelectItem>
-                <SelectItem value="transferencia">Transferencia</SelectItem>
+                <SelectItem value="efectivo">{isEnglish ? 'Cash' : 'Efectivo'}</SelectItem>
+                <SelectItem value="tarjeta_debito">{isEnglish ? 'Debit Card' : 'Tarjeta de Débito'}</SelectItem>
+                <SelectItem value="tarjeta_credito">{isEnglish ? 'Credit Card' : 'Tarjeta de Crédito'}</SelectItem>
+                <SelectItem value="transferencia">{isEnglish ? 'Transfer' : 'Transferencia'}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -352,9 +359,9 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction 
 
         {/* Descripción */}
         <div className="space-y-2">
-          <Label>Descripción *</Label>
+          <Label>{isEnglish ? 'Description' : 'Descripción'} *</Label>
           <Input
-            placeholder="Ej: Compra en supermercado"
+            placeholder={isEnglish ? 'Ex: Grocery shopping' : 'Ej: Compra en supermercado'}
             value={formData.description}
             onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
             className={errors.description ? 'border-red-500' : ''}
@@ -364,9 +371,9 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction 
 
         {/* Comercio */}
         <div className="space-y-2">
-          <Label>Comercio</Label>
+          <Label>{isEnglish ? 'Merchant' : 'Comercio'}</Label>
           <Input
-            placeholder="Ej: Mercadona, Amazon, etc."
+            placeholder={isEnglish ? 'Ex: Walmart, Amazon, etc.' : 'Ej: Mercadona, Amazon, etc.'}
             value={formData.merchant}
             onChange={(e) => setFormData(prev => ({ ...prev, merchant: e.target.value }))}
           />
@@ -374,10 +381,10 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction 
 
         {/* Etiquetas */}
         <div className="space-y-2">
-          <Label>Etiquetas</Label>
+          <Label>{isEnglish ? 'Tags' : 'Etiquetas'}</Label>
           <div className="flex items-center space-x-2">
             <Input
-              placeholder="Añadir etiqueta"
+              placeholder={isEnglish ? 'Add tag' : 'Añadir etiqueta'}
               value={newTag}
               onChange={(e) => setNewTag(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && addTag()}
@@ -406,10 +413,14 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction 
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose}>
-            Cancelar
+            {t.common.cancel}
           </Button>
           <Button onClick={handleSave} disabled={loading}>
-            {loading ? 'Guardando...' : (transaction ? 'Actualizar' : 'Crear')}
+            {loading 
+              ? (isEnglish ? 'Saving...' : 'Guardando...') 
+              : (transaction 
+                  ? (isEnglish ? 'Update' : 'Actualizar') 
+                  : (isEnglish ? 'Create' : 'Crear'))}
           </Button>
         </DialogFooter>
       </DialogContent>
