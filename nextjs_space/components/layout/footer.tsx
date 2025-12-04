@@ -2,8 +2,10 @@
 
 import Link from 'next/link';
 import { Github, Twitter, Linkedin, Mail, ExternalLink } from 'lucide-react';
+import { useI18n } from '@/lib/i18n/context';
 
 export function Footer() {
+  const { t } = useI18n();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -12,12 +14,12 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Section */}
           <div className="space-y-3">
-            <h3 className="font-bold text-lg">Finanzas Personales</h3>
+            <h3 className="font-bold text-lg">{t.footer.brand}</h3>
             <p className="text-sm text-muted-foreground">
-              Gestiona tus finanzas de manera inteligente con IA
+              {t.footer.brandDescription}
             </p>
             <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Powered by</span>
+              <span className="text-muted-foreground">{t.footer.poweredBy}</span>
               <Link
                 href="https://atonixdev.com"
                 target="_blank"
@@ -31,7 +33,7 @@ export function Footer() {
 
           {/* Quick Links */}
           <div className="space-y-3">
-            <h4 className="font-semibold text-sm">Producto</h4>
+            <h4 className="font-semibold text-sm">{t.footer.product}</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/dashboard" className="text-muted-foreground hover:text-primary transition-colors">
@@ -40,17 +42,17 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/transacciones" className="text-muted-foreground hover:text-primary transition-colors">
-                  Transacciones
+                  {t.nav.transactions}
                 </Link>
               </li>
               <li>
                 <Link href="/presupuestos" className="text-muted-foreground hover:text-primary transition-colors">
-                  Presupuestos
+                  {t.nav.budgets}
                 </Link>
               </li>
               <li>
                 <Link href="/analisis" className="text-muted-foreground hover:text-primary transition-colors">
-                  Análisis IA
+                  {t.nav.analysis}
                 </Link>
               </li>
             </ul>
@@ -58,7 +60,7 @@ export function Footer() {
 
           {/* Company */}
           <div className="space-y-3">
-            <h4 className="font-semibold text-sm">atonixdev.com</h4>
+            <h4 className="font-semibold text-sm">{t.footer.company}</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
@@ -66,7 +68,7 @@ export function Footer() {
                   target="_blank"
                   className="text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
                 >
-                  Sobre Nosotros
+                  {t.footer.aboutUs}
                   <ExternalLink className="h-3 w-3" />
                 </Link>
               </li>
@@ -76,7 +78,7 @@ export function Footer() {
                   target="_blank"
                   className="text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
                 >
-                  Blog
+                  {t.footer.blog}
                   <ExternalLink className="h-3 w-3" />
                 </Link>
               </li>
@@ -86,7 +88,7 @@ export function Footer() {
                   target="_blank"
                   className="text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
                 >
-                  Proyectos
+                  {t.footer.projects}
                   <ExternalLink className="h-3 w-3" />
                 </Link>
               </li>
@@ -96,7 +98,7 @@ export function Footer() {
                   target="_blank"
                   className="text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
                 >
-                  Contacto
+                  {t.footer.contact}
                   <ExternalLink className="h-3 w-3" />
                 </Link>
               </li>
@@ -105,23 +107,23 @@ export function Footer() {
 
           {/* Legal & Social */}
           <div className="space-y-3">
-            <h4 className="font-semibold text-sm">Legal</h4>
+            <h4 className="font-semibold text-sm">{t.footer.legal}</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/privacidad" className="text-muted-foreground hover:text-primary transition-colors">
-                  Privacidad
+                  {t.footer.privacy}
                 </Link>
               </li>
               <li>
                 <Link href="/terminos" className="text-muted-foreground hover:text-primary transition-colors">
-                  Términos de Uso
+                  {t.footer.terms}
                 </Link>
               </li>
             </ul>
 
             {/* Social Links */}
             <div className="pt-3">
-              <h4 className="font-semibold text-sm mb-3">Síguenos</h4>
+              <h4 className="font-semibold text-sm mb-3">{t.footer.followUs}</h4>
               <div className="flex gap-3">
                 <Link
                   href="https://github.com/atonixdev"
@@ -163,10 +165,10 @@ export function Footer() {
         <div className="mt-8 pt-6 border-t">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
             <p>
-              © {currentYear} atonixdev.com. Todos los derechos reservados.
+              © {currentYear} atonixdev.com. {t.footer.allRightsReserved}
             </p>
             <p className="flex items-center gap-2">
-              Hecho con <span className="text-red-500">♥</span> usando IA y tecnología
+              {t.footer.madeWith} <span className="text-red-500">♥</span> {t.footer.usingAI}
             </p>
           </div>
         </div>
