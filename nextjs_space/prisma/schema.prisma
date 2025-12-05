@@ -1,11 +1,11 @@
 generator client {
-    provider = "prisma-client-js"
-    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+    provider      = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
-    provider = "sqlite"
-    url      = "file:./dev.db"
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 // NextAuth.js required tables
@@ -71,8 +71,8 @@ model User {
 model UserSettings {
   id         String   @id @default(cuid())
   user_id    String   @unique
-  language   String   @default("es") // es, en, pt, fr, de
-  currency   String   @default("EUR") // EUR, USD, GBP, etc
+  language   String   @default("es")
+  currency   String   @default("EUR")
   updated_at DateTime @updatedAt
   
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
@@ -81,8 +81,8 @@ model UserSettings {
 model AuditLog {
   id         String   @id @default(cuid())
   user_id    String
-  action     String   // login, logout, create, update, delete
-  entity     String?  // transaction, budget, account, etc
+  action     String
+  entity     String?
   entity_id  String?
   ip_address String?
   user_agent String?
@@ -165,7 +165,7 @@ model Budget {
   id          String   @id @default(cuid())
   user_id     String
   category_id String
-  month       String   // Format: YYYY-MM
+  month       String
   amount      Float
   created_at  DateTime @default(now())
   
@@ -177,10 +177,10 @@ model Budget {
 
 model Feedback {
   id         String   @id @default(cuid())
-  user_id    String?  // Null si es feedback anónimo
-  rating     String?  // positive, negative
+  user_id    String?
+  rating     String?
   message    String?  @db.Text
-  url        String?  // Página donde se envió el feedback
+  url        String?
   user_agent String?  @db.Text
   created_at DateTime @default(now())
 

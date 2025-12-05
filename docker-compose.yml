@@ -1,0 +1,23 @@
+services:
+  finanzas-app:
+    build:
+      context: ./nextjs_space
+      dockerfile: Dockerfile
+    container_name: finanzas-app
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://n8natonixdev:fWFHE3mBxTtnQV0LoBlDA1fgW5kL3vNfN9XLMNY@n8n-postgres:5432/finanzas_db?schema=public
+      - NEXTAUTH_URL=https://projects.atonixdev.com/finanzas
+      - NEXTAUTH_SECRET=atonix-finanzas-super-secret-key-2024-production
+      - NODE_ENV=production
+    networks:
+      - n8n_n8n-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/finanzas/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+networks:
+  n8n_n8n-network:
+    external: true

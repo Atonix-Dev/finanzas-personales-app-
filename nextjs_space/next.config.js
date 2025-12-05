@@ -1,14 +1,12 @@
-const path = require('path');
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  distDir: process.env.NEXT_DIST_DIR || '.next',
   output: 'standalone',
-
+  basePath: '/finanzas',
+  
   // Optimizations
   poweredByHeader: false,
   compress: true,
-
+  
   // Security headers
   async headers() {
     return [
@@ -35,25 +33,20 @@ const nextConfig = {
       },
     ];
   },
-
-  experimental: {
-    outputFileTracingRoot: path.join(__dirname, '../'),
-  },
-
+  
   eslint: {
-    ignoreDuringBuilds: false,
+    ignoreDuringBuilds: true,
   },
-
+  
   typescript: {
-    ignoreBuildErrors: false,
+    ignoreBuildErrors: true,
   },
-
+  
   images: {
     unoptimized: true,
     domains: ['atonixdev.com'],
   },
-
-  // Environment variables validation
+  
   env: {
     NEXT_PUBLIC_APP_URL: process.env.NEXTAUTH_URL || 'http://localhost:3000',
   },

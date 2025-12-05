@@ -6,9 +6,9 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
-# Install dependencies
-COPY package.json yarn.lock* ./
-RUN yarn install --frozen-lockfile
+# Install dependencies con npm
+COPY package.json package-lock.json* ./
+RUN npm ci --legacy-peer-deps
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -21,7 +21,7 @@ RUN npx prisma generate
 
 # Build Next.js
 ENV NEXT_TELEMETRY_DISABLED 1
-RUN yarn build
+RUN npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
