@@ -292,6 +292,27 @@ export const translations = {
       madeWith: 'Hecho con',
       usingAI: 'usando IA y tecnología',
     },
+    // Feedback Widget
+    feedback: {
+      title: '¿Qué opinas de la app?',
+      description: 'Tu feedback es muy valioso para nosotros. Ayúdanos a mejorar 🚀',
+      experienceQuestion: '¿Cómo ha sido tu experiencia?',
+      like: 'Me gusta',
+      dislike: 'No me gusta',
+      improveQuestion: '¿Qué podemos mejorar?',
+      tellUsQuestion: '¿Qué te gustaría decirnos?',
+      improvePlaceholder: 'Cuéntanos qué no te gustó o qué podemos mejorar...',
+      tellUsPlaceholder: 'Cuéntanos qué te gustó o sugiere nuevas features...',
+      suggestFeatures: 'También puedes sugerirnos nuevas funcionalidades 💡',
+      send: 'Enviar Feedback',
+      sending: 'Enviando...',
+      emptyTitle: 'Feedback vacío',
+      emptyDescription: 'Por favor, selecciona una calificación o escribe un mensaje.',
+      successTitle: '¡Gracias por tu feedback! 🎉',
+      successDescription: 'Tu opinión nos ayuda a mejorar la app.',
+      errorTitle: 'Error',
+      errorDescription: 'No se pudo enviar el feedback. Inténtalo de nuevo.',
+    },
     // Legal
     legal: {
       privacy: {
@@ -710,6 +731,27 @@ export const translations = {
       allRightsReserved: 'All rights reserved.',
       madeWith: 'Made with',
       usingAI: 'using AI and technology',
+    },
+    // Feedback Widget
+    feedback: {
+      title: 'What do you think of the app?',
+      description: 'Your feedback is very valuable to us. Help us improve 🚀',
+      experienceQuestion: 'How has your experience been?',
+      like: 'I like it',
+      dislike: "I don't like it",
+      improveQuestion: 'What can we improve?',
+      tellUsQuestion: 'What would you like to tell us?',
+      improvePlaceholder: "Tell us what you didn't like or what we can improve...",
+      tellUsPlaceholder: 'Tell us what you liked or suggest new features...',
+      suggestFeatures: 'You can also suggest new features 💡',
+      send: 'Send Feedback',
+      sending: 'Sending...',
+      emptyTitle: 'Empty feedback',
+      emptyDescription: 'Please select a rating or write a message.',
+      successTitle: 'Thanks for your feedback! 🎉',
+      successDescription: 'Your opinion helps us improve the app.',
+      errorTitle: 'Error',
+      errorDescription: 'Could not send feedback. Please try again.',
     },
     // Legal
     legal: {
