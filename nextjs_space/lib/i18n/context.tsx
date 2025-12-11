@@ -11,105 +11,91 @@ interface I18nContextType {
   currency: string;
   setCurrency: (curr: string) => void;
   formatCurrency: (amount: number) => string;
+  isHydrated: boolean;
 }
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
+// Valores por defecto constantes (evita hidratación inconsistente)
+const DEFAULT_LANGUAGE: Language = 'es';
+const DEFAULT_CURRENCY = 'EUR';
+
 export function I18nProvider({ children }: { children: ReactNode }) {
-  // Inicializar con valores de localStorage si existen
-  const [language, setLanguageState] = useState<Language>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('user-language') as Language;
-      if (saved && translations[saved]) {
-        return saved;
-      }
-    }
-    return 'es';
-  });
-
-  const [currency, setCurrencyState] = useState<string>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('user-currency');
-      if (saved && currencies[saved as keyof typeof currencies]) {
-        return saved;
-      }
-    }
-    return 'EUR';
-  });
-
-  const [isLoading, setIsLoading] = useState(true);
+  // ✅ SIEMPRE inicializar con valores por defecto (igual en server y client)
+  const [language, setLanguageState] = useState<Language>(DEFAULT_LANGUAGE);
+  const [currency, setCurrencyState] = useState<string>(DEFAULT_CURRENCY);
+  const [isHydrated, setIsHydrated] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
+  // ✅ Cargar valores de localStorage DESPUÉS de la hidratación (solo en cliente)
   useEffect(() => {
-    // Cargar desde la API en segundo plano (solo en rutas autenticadas) - SOLO UNA VEZ
-    if (isInitialized) return;
-    
+    // Primero cargar de localStorage para evitar flash
+    const savedLang = localStorage.getItem('user-language') as Language;
+    const savedCurr = localStorage.getItem('user-currency');
+
+    if (savedLang && translations[savedLang]) {
+      setLanguageState(savedLang);
+    }
+    if (savedCurr && currencies[savedCurr as keyof typeof currencies]) {
+      setCurrencyState(savedCurr);
+    }
+
+    setIsHydrated(true);
+  }, []);
+
+  // Cargar desde la API (solo una vez, después de hidratación)
+  useEffect(() => {
+    if (!isHydrated || isInitialized) return;
+
     const loadSettings = async () => {
       try {
-        // Solo intentar cargar desde la API si estamos en rutas que requieren autenticación
-        const isAuthRoute = typeof window !== 'undefined' && (
+        // Solo intentar cargar desde la API si estamos en rutas autenticadas
+        const isAuthRoute = 
           window.location.pathname.startsWith('/dashboard') ||
           window.location.pathname.startsWith('/transacciones') ||
           window.location.pathname.startsWith('/cuentas') ||
           window.location.pathname.startsWith('/presupuestos') ||
-          window.location.pathname.startsWith('/analisis')
-        );
+          window.location.pathname.startsWith('/analisis');
 
         if (isAuthRoute) {
           const response = await fetch('/api/settings');
-          // Solo actualizar si el usuario está autenticado (status 200)
           if (response.ok) {
             const data = await response.json();
-            
-            // Solo actualizar si son diferentes de los valores de localStorage
-            const storedLang = localStorage.getItem('user-language');
-            const storedCurr = localStorage.getItem('user-currency');
-            
-            if (data.language && translations[data.language as Language] && data.language !== storedLang) {
+
+            if (data.language && translations[data.language as Language]) {
               setLanguageState(data.language);
-              if (typeof window !== 'undefined') {
-                localStorage.setItem('user-language', data.language);
-              }
+              localStorage.setItem('user-language', data.language);
             }
-            if (data.currency && currencies[data.currency as keyof typeof currencies] && data.currency !== storedCurr) {
+            if (data.currency && currencies[data.currency as keyof typeof currencies]) {
               setCurrencyState(data.currency);
-              if (typeof window !== 'undefined') {
-                localStorage.setItem('user-currency', data.currency);
-              }
+              localStorage.setItem('user-currency', data.currency);
             }
           }
         }
-        setIsInitialized(true);
       } catch (error) {
-        // Error de red o servidor, seguir con localStorage o valores por defecto
         console.error('Error loading settings from API:', error);
-        setIsInitialized(true);
       } finally {
-        setIsLoading(false);
+        setIsInitialized(true);
       }
     };
 
     loadSettings();
-  }, []);
+  }, [isHydrated, isInitialized]);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('user-language', lang);
-    }
+    localStorage.setItem('user-language', lang);
   };
 
   const setCurrency = (curr: string) => {
     setCurrencyState(curr);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('user-currency', curr);
-    }
+    localStorage.setItem('user-currency', curr);
   };
 
   const formatCurrency = (amount: number): string => {
     const currencyInfo = currencies[currency as keyof typeof currencies];
     if (!currencyInfo) return `${amount.toFixed(2)} ${currency}`;
-    
+
     const formatted = amount.toFixed(2);
     return currencyInfo.position === 'before'
       ? `${currencyInfo.symbol}${formatted}`
@@ -119,7 +105,15 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const t = translations[language];
 
   return (
-    <I18nContext.Provider value={{ language, setLanguage, t, currency, setCurrency, formatCurrency }}>
+    <I18nContext.Provider value={{ 
+      language, 
+      setLanguage, 
+      t, 
+      currency, 
+      setCurrency, 
+      formatCurrency,
+      isHydrated 
+    }}>
       {children}
     </I18nContext.Provider>
   );
