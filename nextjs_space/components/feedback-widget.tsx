@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MessageSquare, X, Send, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { MessageSquare, Send, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -14,6 +14,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { useI18n } from '@/lib/i18n/context';
 
 export function FeedbackWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,12 +22,13 @@ export function FeedbackWidget() {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { t } = useI18n();
 
   const handleSubmit = async () => {
     if (!rating && !message.trim()) {
       toast({
-        title: 'Feedback vacío',
-        description: 'Por favor, selecciona una calificación o escribe un mensaje.',
+        title: t.feedback.emptyTitle,
+        description: t.feedback.emptyDescription,
         variant: 'destructive',
       });
       return;
@@ -51,8 +53,8 @@ export function FeedbackWidget() {
       if (!response.ok) throw new Error('Error al enviar feedback');
 
       toast({
-        title: '¡Gracias por tu feedback! 🎉',
-        description: 'Tu opinión nos ayuda a mejorar la app.',
+        title: t.feedback.successTitle,
+        description: t.feedback.successDescription,
       });
 
       // Reset form
@@ -62,8 +64,8 @@ export function FeedbackWidget() {
     } catch (error) {
       console.error('Error sending feedback:', error);
       toast({
-        title: 'Error',
-        description: 'No se pudo enviar el feedback. Inténtalo de nuevo.',
+        title: t.feedback.errorTitle,
+        description: t.feedback.errorDescription,
         variant: 'destructive',
       });
     } finally {
@@ -73,29 +75,30 @@ export function FeedbackWidget() {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Floating Button - Smaller & Semi-transparent */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Button
-            className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg hover:scale-110 transition-transform z-50"
+            className="fixed bottom-6 right-6 h-10 w-10 rounded-full shadow-lg hover:scale-110 transition-all z-50 opacity-50 hover:opacity-100"
             size="icon"
+            variant="secondary"
           >
-            <MessageSquare className="h-6 w-6" />
+            <MessageSquare className="h-4 w-4" />
           </Button>
         </DialogTrigger>
 
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>¿Qué opinas de Finanzas App?</DialogTitle>
+            <DialogTitle>{t.feedback.title}</DialogTitle>
             <DialogDescription>
-              Tu feedback es muy valioso para nosotros. Ayúdanos a mejorar 🚀
+              {t.feedback.description}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             {/* Rating */}
             <div className="space-y-2">
-              <Label>¿Cómo ha sido tu experiencia?</Label>
+              <Label>{t.feedback.experienceQuestion}</Label>
               <div className="flex gap-3">
                 <Button
                   type="button"
@@ -104,7 +107,7 @@ export function FeedbackWidget() {
                   onClick={() => setRating('positive')}
                 >
                   <ThumbsUp className="mr-2 h-4 w-4" />
-                  Me gusta
+                  {t.feedback.like}
                 </Button>
                 <Button
                   type="button"
@@ -113,7 +116,7 @@ export function FeedbackWidget() {
                   onClick={() => setRating('negative')}
                 >
                   <ThumbsDown className="mr-2 h-4 w-4" />
-                  No me gusta
+                  {t.feedback.dislike}
                 </Button>
               </div>
             </div>
@@ -122,15 +125,15 @@ export function FeedbackWidget() {
             <div className="space-y-2">
               <Label htmlFor="feedback-message">
                 {rating === 'negative'
-                  ? '¿Qué podemos mejorar?'
-                  : '¿Qué te gustaría decirnos?'}
+                  ? t.feedback.improveQuestion
+                  : t.feedback.tellUsQuestion}
               </Label>
               <Textarea
                 id="feedback-message"
                 placeholder={
                   rating === 'negative'
-                    ? 'Cuéntanos qué no te gustó o qué podemos mejorar...'
-                    : 'Cuéntanos qué te gustó o sugiere nuevas features...'
+                    ? t.feedback.improvePlaceholder
+                    : t.feedback.tellUsPlaceholder
                 }
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -138,7 +141,7 @@ export function FeedbackWidget() {
                 className="resize-none"
               />
               <p className="text-xs text-muted-foreground">
-                También puedes sugerirnos nuevas funcionalidades 💡
+                {t.feedback.suggestFeatures}
               </p>
             </div>
           </div>
@@ -151,7 +154,7 @@ export function FeedbackWidget() {
               className="flex-1"
               disabled={isSubmitting}
             >
-              Cancelar
+              {t.common.cancel}
             </Button>
             <Button
               onClick={handleSubmit}
@@ -159,11 +162,11 @@ export function FeedbackWidget() {
               className="flex-1"
             >
               {isSubmitting ? (
-                <>Enviando...</>
+                <>{t.feedback.sending}</>
               ) : (
                 <>
                   <Send className="mr-2 h-4 w-4" />
-                  Enviar Feedback
+                  {t.feedback.send}
                 </>
               )}
             </Button>
