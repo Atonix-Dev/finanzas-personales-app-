@@ -231,6 +231,8 @@ export const translations = {
       analysisReady: 'Tu análisis financiero está listo',
       analysisError: 'Error en el análisis',
       analysisErrorMessage: 'No se pudo completar el análisis financiero. Asegúrate de tener al menos 3 transacciones registradas.',
+      comingSoon: 'Próximamente',
+      comingSoonMessage: 'Esta funcionalidad está en desarrollo. Pronto podrás obtener análisis financieros con IA.',
     },
     // Configuración
     settings: {
@@ -289,6 +291,93 @@ export const translations = {
       allRightsReserved: 'Todos los derechos reservados.',
       madeWith: 'Hecho con',
       usingAI: 'usando IA y tecnología',
+    },
+    // Legal
+    legal: {
+      privacy: {
+        title: 'Política de Privacidad',
+        lastUpdated: 'Última actualización',
+        sections: {
+          intro: {
+            title: 'Introducción',
+            content: 'En Finanzas Personales, nos comprometemos a proteger tu privacidad. Esta política describe cómo recopilamos, usamos y protegemos tu información personal cuando utilizas nuestra aplicación de gestión financiera.',
+          },
+          dataCollection: {
+            title: 'Datos que Recopilamos',
+            content: 'Recopilamos la información que nos proporcionas directamente al usar la aplicación:',
+            items: {
+              account: 'Información de cuenta: nombre, correo electrónico y contraseña encriptada',
+              transactions: 'Datos financieros: transacciones, cuentas bancarias, presupuestos y categorías',
+              preferences: 'Preferencias: idioma, moneda y configuración de la aplicación',
+              usage: 'Datos de uso: información técnica para mejorar el servicio',
+            },
+          },
+          dataUsage: {
+            title: 'Uso de tus Datos',
+            content: 'Utilizamos tu información para:',
+            items: {
+              service: 'Proporcionar y mantener el servicio de gestión financiera',
+              analysis: 'Generar análisis e insights sobre tus finanzas personales',
+              improvement: 'Mejorar la experiencia de usuario y desarrollar nuevas funcionalidades',
+              communication: 'Comunicarnos contigo sobre actualizaciones importantes',
+            },
+          },
+          security: {
+            title: 'Seguridad de tus Datos',
+            content: 'Implementamos medidas de seguridad técnicas y organizativas para proteger tu información. Tus datos se almacenan de forma segura y las contraseñas se encriptan. No compartimos tu información personal con terceros sin tu consentimiento.',
+          },
+          contact: {
+            title: 'Contacto',
+            content: 'Si tienes preguntas sobre esta política de privacidad o sobre cómo manejamos tus datos, puedes contactarnos:',
+          },
+        },
+      },
+      terms: {
+        title: 'Términos de Uso',
+        lastUpdated: 'Última actualización',
+        sections: {
+          acceptance: {
+            title: 'Aceptación de los Términos',
+            content: 'Al acceder y utilizar Finanzas Personales, aceptas estar sujeto a estos Términos de Uso. Si no estás de acuerdo con alguna parte de estos términos, no podrás acceder al servicio.',
+          },
+          service: {
+            title: 'Descripción del Servicio',
+            content: 'Finanzas Personales es una aplicación de gestión financiera personal que te permite:',
+            items: {
+              tracking: 'Registrar y categorizar tus ingresos y gastos',
+              budgets: 'Crear y gestionar presupuestos mensuales',
+              analysis: 'Obtener análisis e insights sobre tus finanzas',
+              export: 'Exportar tus datos financieros',
+            },
+          },
+          userResponsibilities: {
+            title: 'Responsabilidades del Usuario',
+            content: 'Como usuario, te comprometes a:',
+            items: {
+              accuracy: 'Proporcionar información precisa y veraz',
+              security: 'Mantener la seguridad de tu cuenta y contraseña',
+              lawful: 'Usar el servicio de manera legal y ética',
+            },
+          },
+          limitations: {
+            title: 'Limitaciones de Responsabilidad',
+            content: 'Finanzas Personales se proporciona "tal cual" sin garantías de ningún tipo. No somos responsables de decisiones financieras tomadas basándose en la información proporcionada por la aplicación. Te recomendamos consultar con un asesor financiero profesional para decisiones importantes.',
+          },
+          prohibited: {
+            title: 'Uso Prohibido',
+            content: 'Está prohibido usar el servicio para:',
+            items: {
+              illegal: 'Actividades ilegales o fraudulentas',
+              harm: 'Intentar dañar o comprometer la seguridad del sistema',
+              reverse: 'Ingeniería inversa o copiar el código de la aplicación',
+            },
+          },
+          contact: {
+            title: 'Contacto',
+            content: 'Para cualquier consulta sobre estos términos de uso, puedes contactarnos:',
+          },
+        },
+      },
     },
     // Común
     common: {
@@ -562,6 +651,8 @@ export const translations = {
       analysisReady: 'Your financial analysis is ready',
       analysisError: 'Analysis error',
       analysisErrorMessage: 'Could not complete financial analysis. Make sure you have at least 3 registered transactions.',
+      comingSoon: 'Coming Soon',
+      comingSoonMessage: 'This feature is under development. Soon you will be able to get AI-powered financial analysis.',
     },
     settings: {
       title: 'Settings',
@@ -619,6 +710,93 @@ export const translations = {
       allRightsReserved: 'All rights reserved.',
       madeWith: 'Made with',
       usingAI: 'using AI and technology',
+    },
+    // Legal
+    legal: {
+      privacy: {
+        title: 'Privacy Policy',
+        lastUpdated: 'Last updated',
+        sections: {
+          intro: {
+            title: 'Introduction',
+            content: 'At Personal Finance, we are committed to protecting your privacy. This policy describes how we collect, use, and protect your personal information when you use our financial management application.',
+          },
+          dataCollection: {
+            title: 'Data We Collect',
+            content: 'We collect information that you provide directly when using the application:',
+            items: {
+              account: 'Account information: name, email address, and encrypted password',
+              transactions: 'Financial data: transactions, bank accounts, budgets, and categories',
+              preferences: 'Preferences: language, currency, and application settings',
+              usage: 'Usage data: technical information to improve the service',
+            },
+          },
+          dataUsage: {
+            title: 'How We Use Your Data',
+            content: 'We use your information to:',
+            items: {
+              service: 'Provide and maintain the financial management service',
+              analysis: 'Generate analysis and insights about your personal finances',
+              improvement: 'Improve user experience and develop new features',
+              communication: 'Communicate with you about important updates',
+            },
+          },
+          security: {
+            title: 'Data Security',
+            content: 'We implement technical and organizational security measures to protect your information. Your data is stored securely and passwords are encrypted. We do not share your personal information with third parties without your consent.',
+          },
+          contact: {
+            title: 'Contact',
+            content: 'If you have questions about this privacy policy or how we handle your data, you can contact us:',
+          },
+        },
+      },
+      terms: {
+        title: 'Terms of Use',
+        lastUpdated: 'Last updated',
+        sections: {
+          acceptance: {
+            title: 'Acceptance of Terms',
+            content: 'By accessing and using Personal Finance, you agree to be bound by these Terms of Use. If you do not agree to any part of these terms, you may not access the service.',
+          },
+          service: {
+            title: 'Service Description',
+            content: 'Personal Finance is a personal financial management application that allows you to:',
+            items: {
+              tracking: 'Record and categorize your income and expenses',
+              budgets: 'Create and manage monthly budgets',
+              analysis: 'Get analysis and insights about your finances',
+              export: 'Export your financial data',
+            },
+          },
+          userResponsibilities: {
+            title: 'User Responsibilities',
+            content: 'As a user, you agree to:',
+            items: {
+              accuracy: 'Provide accurate and truthful information',
+              security: 'Maintain the security of your account and password',
+              lawful: 'Use the service legally and ethically',
+            },
+          },
+          limitations: {
+            title: 'Limitations of Liability',
+            content: 'Personal Finance is provided "as is" without warranties of any kind. We are not responsible for financial decisions made based on information provided by the application. We recommend consulting with a professional financial advisor for important decisions.',
+          },
+          prohibited: {
+            title: 'Prohibited Use',
+            content: 'It is prohibited to use the service for:',
+            items: {
+              illegal: 'Illegal or fraudulent activities',
+              harm: 'Attempting to damage or compromise system security',
+              reverse: 'Reverse engineering or copying the application code',
+            },
+          },
+          contact: {
+            title: 'Contact',
+            content: 'For any questions about these terms of use, you can contact us:',
+          },
+        },
+      },
     },
     common: {
       save: 'Save',
