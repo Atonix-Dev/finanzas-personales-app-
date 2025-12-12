@@ -75,11 +75,11 @@ export function FeedbackWidget() {
 
   return (
     <>
-      {/* Floating Button - Smaller & Semi-transparent */}
+      {/* Floating Button - Smaller & Semi-transparent with border */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Button
-            className="fixed bottom-6 right-6 h-10 w-10 rounded-full shadow-lg hover:scale-110 transition-all z-50 opacity-50 hover:opacity-100"
+            className="fixed bottom-6 right-6 h-10 w-10 rounded-full shadow-lg hover:scale-110 transition-all z-50 opacity-60 hover:opacity-100 border border-border"
             size="icon"
             variant="secondary"
           >
