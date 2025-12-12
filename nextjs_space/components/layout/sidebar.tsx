@@ -16,7 +16,10 @@ import {
   Euro,
   Download,
   X,
-  Settings
+  Settings,
+  Users,
+  FolderKanban,
+  FileText
 } from 'lucide-react'
 import { useI18n } from '@/lib/i18n/context'
 
@@ -31,11 +34,23 @@ export default function Sidebar({ isOpen = true, onClose, isMobile = false }: Si
   const { data: session, status } = useSession() || {}
   const { t } = useI18n()
 
-  const navigation = [
+  // Navegación principal - Finanzas personales
+  const mainNavigation = [
     { name: t.nav.dashboard, href: '/dashboard', icon: LayoutDashboard },
     { name: t.nav.transactions, href: '/transacciones', icon: Receipt },
     { name: t.nav.accounts, href: '/cuentas', icon: CreditCard },
     { name: t.nav.budgets, href: '/presupuestos', icon: Target },
+  ]
+
+  // Navegación para autónomos/emprendedores
+  const freelancerNavigation = [
+    { name: t.nav.clients, href: '/clientes', icon: Users },
+    { name: t.nav.projects, href: '/proyectos', icon: FolderKanban },
+    { name: t.nav.invoices, href: '/facturas', icon: FileText },
+  ]
+
+  // Otras opciones
+  const otherNavigation = [
     { name: t.nav.analysis, href: '/analisis', icon: Brain },
     { name: t.nav.settings, href: '/dashboard/configuracion', icon: Settings },
   ]
@@ -56,6 +71,27 @@ export default function Sidebar({ isOpen = true, onClose, isMobile = false }: Si
     if (isMobile && onClose) {
       onClose()
     }
+  }
+
+  const NavItem = ({ item }: { item: { name: string; href: string; icon: any } }) => {
+    const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
+    return (
+      <Link
+        key={item.name}
+        href={item.href}
+        onClick={handleNavClick}
+        className={`
+          flex items-center space-x-3 px-3 py-2.5 lg:py-2 rounded-lg text-sm font-medium transition-colors
+          ${isActive 
+            ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300' 
+            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+          }
+        `}
+      >
+        <item.icon className="h-5 w-5 flex-shrink-0" />
+        <span>{item.name}</span>
+      </Link>
+    )
   }
 
   return (
@@ -110,26 +146,32 @@ export default function Sidebar({ isOpen = true, onClose, isMobile = false }: Si
 
         {/* Navigation */}
         <nav className="flex-1 p-3 lg:p-4 space-y-1 lg:space-y-2 overflow-y-auto">
-          {navigation.map((item) => {
-            const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                onClick={handleNavClick}
-                className={`
-                  flex items-center space-x-3 px-3 py-2.5 lg:py-2 rounded-lg text-sm font-medium transition-colors
-                  ${isActive 
-                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300' 
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }
-                `}
-              >
-                <item.icon className="h-5 w-5 flex-shrink-0" />
-                <span>{item.name}</span>
-              </Link>
-            )
-          })}
+          {/* Finanzas Personales */}
+          {mainNavigation.map((item) => (
+            <NavItem key={item.name} item={item} />
+          ))}
+
+          {/* Separador - Autónomos */}
+          <div className="pt-4 pb-2">
+            <p className="px-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              {t.nav.freelancer}
+            </p>
+          </div>
+
+          {freelancerNavigation.map((item) => (
+            <NavItem key={item.name} item={item} />
+          ))}
+
+          {/* Separador - Otros */}
+          <div className="pt-4 pb-2">
+            <p className="px-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              {t.nav.other}
+            </p>
+          </div>
+
+          {otherNavigation.map((item) => (
+            <NavItem key={item.name} item={item} />
+          ))}
         </nav>
 
         {/* Footer */}
