@@ -44,7 +44,54 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// Main application models
+// ============================================
+// ENUMS
+// ============================================
+
+enum AccountType {
+  corriente
+  credito
+  efectivo
+  ahorros
+}
+
+enum PaymentMethod {
+  efectivo
+  tarjeta_debito
+  tarjeta_credito
+  transferencia
+}
+
+enum TransactionType {
+  ingreso
+  gasto
+}
+
+enum ClientType {
+  particular
+  empresa
+}
+
+enum ProjectStatus {
+  pendiente
+  en_progreso
+  completado
+  cancelado
+  pausado
+}
+
+enum InvoiceStatus {
+  borrador
+  enviada
+  pagada
+  vencida
+  cancelada
+}
+
+// ============================================
+// MAIN APPLICATION MODELS
+// ============================================
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -58,7 +105,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   
-  // App relations
+  // App relations - Personal Finance
   user_accounts    UserAccount[]
   categories       Category[]
   transactions     Transaction[]
@@ -66,13 +113,31 @@ model User {
   settings         UserSettings?
   audit_logs       AuditLog[]
   feedbacks        Feedback[]
+  
+  // App relations - Freelancer/Entrepreneur
+  clients          Client[]
+  projects         Project[]
+  invoices         Invoice[]
 }
 
 model UserSettings {
-  id         String   @id @default(cuid())
-  user_id    String   @unique
-  language   String   @default("es")
-  currency   String   @default("EUR")
+  id                  String   @id @default(cuid())
+  user_id             String   @unique
+  language            String   @default("es")
+  currency            String   @default("EUR")
+  // Invoice settings
+  invoice_prefix      String   @default("")
+  invoice_next_number Int      @default(1)
+  // Business info (for invoices)
+  business_name       String?
+  business_tax_id     String?  // NIF/CIF del usuario
+  business_address    String?
+  business_city       String?
+  business_postal_code String?
+  business_country    String   @default("España")
+  business_email      String?
+  business_phone      String?
+  
   updated_at DateTime @updatedAt
   
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
@@ -93,24 +158,9 @@ model AuditLog {
   @@index([user_id, created_at])
 }
 
-enum AccountType {
-  corriente
-  credito
-  efectivo
-  ahorros
-}
-
-enum PaymentMethod {
-  efectivo
-  tarjeta_debito
-  tarjeta_credito
-  transferencia
-}
-
-enum TransactionType {
-  ingreso
-  gasto
-}
+// ============================================
+// PERSONAL FINANCE MODELS
+// ============================================
 
 model UserAccount {
   id         String      @id @default(cuid())
@@ -188,4 +238,115 @@ model Feedback {
 
   @@index([user_id, created_at])
   @@index([created_at])
+}
+
+// ============================================
+// FREELANCER / ENTREPRENEUR MODELS
+// ============================================
+
+model Client {
+  id           String     @id @default(cuid())
+  user_id      String
+  name         String
+  type         ClientType @default(particular)
+  tax_id       String?    // NIF/CIF
+  email        String?
+  phone        String?
+  address      String?
+  city         String?
+  postal_code  String?
+  country      String     @default("España")
+  notes        String?    @db.Text
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @updatedAt
+
+  user     User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  projects Project[]
+  invoices Invoice[]
+
+  @@index([user_id])
+  @@index([user_id, name])
+}
+
+model Project {
+  id           String        @id @default(cuid())
+  user_id      String
+  client_id    String?
+  name         String
+  description  String?       @db.Text
+  status       ProjectStatus @default(pendiente)
+  budget       Float?
+  currency     String        @default("EUR")
+  start_date   DateTime?
+  end_date     DateTime?
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @updatedAt
+
+  user         User                 @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  client       Client?              @relation(fields: [client_id], references: [id], onDelete: SetNull)
+  invoices     Invoice[]
+  transactions ProjectTransaction[]
+
+  @@index([user_id])
+  @@index([user_id, status])
+  @@index([client_id])
+}
+
+model ProjectTransaction {
+  id          String          @id @default(cuid())
+  project_id  String
+  type        TransactionType
+  amount      Float
+  currency    String          @default("EUR")
+  description String
+  date        DateTime
+  created_at  DateTime        @default(now())
+
+  project Project @relation(fields: [project_id], references: [id], onDelete: Cascade)
+
+  @@index([project_id])
+  @@index([project_id, date])
+}
+
+model Invoice {
+  id           String        @id @default(cuid())
+  user_id      String
+  client_id    String
+  project_id   String?
+  number       String
+  status       InvoiceStatus @default(borrador)
+  issue_date   DateTime      @default(now())
+  due_date     DateTime?
+  subtotal     Float         @default(0)
+  tax_rate     Float         @default(21)
+  tax_amount   Float         @default(0)
+  total        Float         @default(0)
+  currency     String        @default("EUR")
+  notes        String?       @db.Text
+  pdf_url      String?
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @updatedAt
+
+  user    User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  client  Client        @relation(fields: [client_id], references: [id], onDelete: Restrict)
+  project Project?      @relation(fields: [project_id], references: [id], onDelete: SetNull)
+  items   InvoiceItem[]
+
+  @@unique([user_id, number])
+  @@index([user_id])
+  @@index([user_id, status])
+  @@index([client_id])
+}
+
+model InvoiceItem {
+  id          String @id @default(cuid())
+  invoice_id  String
+  description String
+  quantity    Float  @default(1)
+  unit_price  Float
+  total       Float
+
+  invoice Invoice @relation(fields: [invoice_id], references: [id], onDelete: Cascade)
+
+  @@index([invoice_id])
 }
